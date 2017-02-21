@@ -70,48 +70,20 @@ module.exports.requestHandler = function(request, response) {
   // node to actually send all the data over to the client.
   // response.end('Hello, World!');
 
-  // var body = [];
-
-    // request.on('data', function(chunk) {
-    //   body.push(JSON.parse((chunk).toString()));
-    // }).on('end', function() {
-    //   body = Buffer.concat(body);
-
-
   if (request.method === 'GET' && request.url === '/classes/messages') {
-    // request.on('data', function(chunk) {
-    //   body.push(JSON.parse((chunk).toString()));
-    // })
-      
-    // var responseBody = {
-    //   headers: headers,
-    //   method: request.method,
-    //   url: request.url,
-    //   body: body
-    // };
-      
     response.writeHead(statusCode, headers);
-    // response.end(JSON.stringify({results: []}));
-    // response.end(request.on('data', function(chunk) {
-    //   body.push(JSON.parse((chunk).toString()));
-    // }));
     response.end(JSON.stringify(storage));
-    // response.write(JSON.stringify(responseBody));
-    // response.end();
-  }
-
-  if (request.method === 'POST' && request.url === '/classes/messages') {
+  } else if (request.method === 'POST' && request.url === '/classes/messages') {
     request.on('data', function(chunk) {
       storage.results.push(JSON.parse(chunk));
       response.writeHead(201, headers);
       response.end(JSON.stringify(storage.results));
     });
+  } else if (request.url !== '/classes/messages') {
+    response.writeHead(404, headers);
+    response.end(JSON.stringify(storage.results));
   }
-
-  statusCode = 404;
-
-
-}
+};
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
