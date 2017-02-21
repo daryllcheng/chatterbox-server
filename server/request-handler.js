@@ -14,6 +14,17 @@ this file and include it in basic-server.js so that it actually works.
 
 // var exports = module.exports = {};
 // var url = require('url');
+// var fs = require('fs');
+// var index = fs.readFileSync('./client/index.html');
+
+var defaultCorsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-headers': 'content-type, accept',
+  'access-control-max-age': 10 // Seconds.
+};
+
+var storage = {results: []};
 
 module.exports.requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -42,8 +53,9 @@ module.exports.requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  // headers['Content-Type'] = 'text/plain';
   // headers['content-type'] = 'application/json';
+  headers['content-type'] = 'application/json';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -58,16 +70,48 @@ module.exports.requestHandler = function(request, response) {
   // node to actually send all the data over to the client.
   // response.end('Hello, World!');
 
+  // var body = [];
+
+    // request.on('data', function(chunk) {
+    //   body.push(JSON.parse((chunk).toString()));
+    // }).on('end', function() {
+    //   body = Buffer.concat(body);
+
+
   if (request.method === 'GET' && request.url === '/classes/messages') {
+    // request.on('data', function(chunk) {
+    //   body.push(JSON.parse((chunk).toString()));
+    // })
+      
+    // var responseBody = {
+    //   headers: headers,
+    //   method: request.method,
+    //   url: request.url,
+    //   body: body
+    // };
+      
     response.writeHead(statusCode, headers);
-    response.end('Hello, World!');
+    // response.end(JSON.stringify({results: []}));
+    // response.end(request.on('data', function(chunk) {
+    //   body.push(JSON.parse((chunk).toString()));
+    // }));
+    response.end(JSON.stringify(storage));
+    // response.write(JSON.stringify(responseBody));
+    // response.end();
   }
 
   if (request.method === 'POST' && request.url === '/classes/messages') {
-    response.writeHead(statusCode, headers);
-    response.end('Hello, World!'); 
-  }  
-};
+    request.on('data', function(chunk) {
+      storage.results.push(JSON.parse(chunk));
+      response.writeHead(201, headers);
+      response.end(JSON.stringify(storage.results));
+    });
+  }
+
+  statusCode = 404;
+
+
+}
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
@@ -78,10 +122,10 @@ module.exports.requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
-  'access-control-max-age': 10 // Seconds.
-};
+// var defaultCorsHeaders = {
+//   'access-control-allow-origin': '*',
+//   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//   'access-control-allow-headers': 'content-type, accept',
+//   'access-control-max-age': 10 // Seconds.
+// };
 

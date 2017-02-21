@@ -64,6 +64,9 @@ describe('Node Server Request Listener Function', function() {
     var req = new stubs.request('/classes/messages', 'POST', stubMsg);
     var res = new stubs.response();
 
+    // console.log('req: ', req)
+    // console.log('res: ', res)
+
     handler.requestHandler(req, res);
 
     // Expect 201 Created response status
