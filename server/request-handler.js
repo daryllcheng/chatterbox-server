@@ -77,11 +77,11 @@ module.exports.requestHandler = function(request, response) {
     request.on('data', function(chunk) {
       storage.results.push(JSON.parse(chunk));
       response.writeHead(201, headers);
-      response.end(JSON.stringify(storage.results));
+      response.end(JSON.stringify(storage));
     });
   } else if (request.url !== '/classes/messages') {
     response.writeHead(404, headers);
-    response.end(JSON.stringify(storage.results));
+    response.end(JSON.stringify(storage));
   }
 };
 
