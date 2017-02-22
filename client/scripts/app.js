@@ -3,7 +3,7 @@ var app = {
 
   //TODO: The current 'handleUsernameClick' function just toggles the class 'friend'
   //to all messages sent by the user
-  server: 'http://127.0.0.1:3000/',
+  server: 'http://127.0.0.1:3000/classes/messages',
   username: 'anonymous',
   roomname: 'lobby',
   lastMessageId: 0,
@@ -26,7 +26,7 @@ var app = {
     app.$roomSelect.on('change', app.handleRoomChange);
 
     // Fetch previous messages
-    app.startSpinner();
+    // app.startSpinner();
     app.fetch(false);
 
     // Poll for new messages
@@ -36,13 +36,13 @@ var app = {
   },
 
   send: function(message) {
-    app.startSpinner();
+    // app.startSpinner();
 
     // POST the message to the server
     $.ajax({
       url: app.server,
       type: 'POST',
-      data: message,
+      data: JSON.parse(message), // json parse
       success: function (data) {
         // Clear messages input
         app.$message.val('');
@@ -56,18 +56,19 @@ var app = {
     });
   },
 
-  fetch: function(animate) {
+  fetch: function() { // Removed animate
     $.ajax({
       url: app.server,
       type: 'GET',
-      data: { order: '-createdAt' },
-      contentType: 'application/json',
+      data: {}, // comment out // data: { order: '-createdAt' } 
+      contentType: 'text/plain',
       success: function(data) {
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) { return; }
 
         // Store messages for caching later
-        app.messages = data.results;
+        data = JSON.stringify(data);
+        app.messages = data.results; // json stringify data = data.stringify(data)
 
         // Get the last message
         var mostRecentMessage = data.results[data.results.length - 1];
@@ -78,7 +79,7 @@ var app = {
           app.renderRoomList(data.results);
 
           // Update the UI with the fetched messages
-          app.renderMessages(data.results, animate);
+          app.renderMessages(data.results); // Removed animate
 
           // Store the ID of the most recent message
           app.lastMessageId = mostRecentMessage.objectId;
@@ -94,10 +95,10 @@ var app = {
     app.$chats.html('');
   },
 
-  renderMessages: function(messages, animate) {
+  renderMessages: function(messages) { // Removed animate
     // Clear existing messages`
     app.clearMessages();
-    app.stopSpinner();
+    // app.stopSpinner();
     if (Array.isArray(messages)) {
       // Add all fetched messages that are in our current room
       messages
@@ -109,9 +110,9 @@ var app = {
     }
 
     // Make it scroll to the top
-    if (animate) {
-      $('body').animate({scrollTop: '0px'}, 'fast');
-    }
+    // if (animate) {
+    //   $('body').animate({scrollTop: '0px'}, 'fast');
+    // }
   },
 
   renderRoomList: function(messages) {
@@ -203,7 +204,7 @@ var app = {
         app.$roomSelect.val(roomname);
       }
     } else {
-      app.startSpinner();
+      // app.startSpinner();
       // Store as undefined for empty names
       app.roomname = app.$roomSelect.val();
     }
@@ -224,13 +225,13 @@ var app = {
     event.preventDefault();
   },
 
-  startSpinner: function() {
-    $('.spinner img').show();
-    $('form input[type=submit]').attr('disabled', 'true');
-  },
+  // startSpinner: function() {
+  //   $('.spinner img').show();
+  //   $('form input[type=submit]').attr('disabled', 'true');
+  // },
 
-  stopSpinner: function() {
-    $('.spinner img').fadeOut('fast');
-    $('form input[type=submit]').attr('disabled', null);
-  }
+  // stopSpinner: function() {
+  //   $('.spinner img').fadeOut('fast');
+  //   $('form input[type=submit]').attr('disabled', null);
+  // }
 };

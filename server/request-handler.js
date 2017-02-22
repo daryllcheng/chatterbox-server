@@ -55,7 +55,7 @@ module.exports.requestHandler = function(request, response) {
   // other than plain text, like JSON or HTML.
   // headers['Content-Type'] = 'text/plain';
   // headers['content-type'] = 'application/json';
-  headers['content-type'] = 'application/json';
+  headers['content-type'] = 'text/plain';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -71,14 +71,20 @@ module.exports.requestHandler = function(request, response) {
   // response.end('Hello, World!');
 
   if (request.method === 'GET' && request.url === '/classes/messages') {
+    console.log('get');
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(storage));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     request.on('data', function(chunk) {
+      console.log('post');
       storage.results.push(JSON.parse(chunk));
       response.writeHead(201, headers);
       response.end(JSON.stringify(storage));
     });
+  } else if (request.method === 'OPTIONS' && request.url === '/classes/messages') {
+    console.log('options');
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify(storage));
   } else if (request.url !== '/classes/messages') {
     response.writeHead(404, headers);
     response.end(JSON.stringify(storage));
